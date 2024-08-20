@@ -1,0 +1,22 @@
+{
+  "users": [
+    {
+      "id": 1,
+      "email": "viniciusfrederico1003@gmail.com",
+      "password": "987654",
+      "age": "21"
+    },
+    {
+      "id": 2,
+      "email": "juliaRibPaiva@hotmail.com",
+      "password": "123456",
+      "age": "14"
+    },
+    {
+      "id": 3,
+      "email": "arthur@hotmail.com",
+      "password": "futebol",
+      "age": "8"
+    }
+  ]
+}
