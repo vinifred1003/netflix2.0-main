@@ -1,56 +1,97 @@
 import './App.css';
-import React, { useState } from 'react';
-import axios from 'axios';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios'
 import { useNavigate } from 'react-router-dom';
 
 function Login() {
-  const [response, setResponse] = useState(null);
-  const [email, setEmail] = useState('');
-  const [senha, setSenha] = useState('');
+  const [response, setResponse] = useState(0);
+  const [email, setEmail] = useState(0);
+  const [senha, setSenha] = useState(0);
   const navigate = useNavigate();
 
-  let onChangeEmail = (e) => setEmail(e.target.value);
-  let onChangeSenha = (e) => setSenha(e.target.value);
-
-  let handleLogin = (shouldRedirect = false) => {
-    if (!email || !senha) {
-      alert('Please enter both email and password');
-      return;
-    }
-    axios.post("http://localhost:3001/login", { email, senha })
-      .then(resp => {
-        if (resp?.data?.sessionID) {
-          sessionStorage.setItem("sessionID", resp.data.sessionID);
-          if (shouldRedirect) {
-            navigate('home');
-          }
-        }
-      })
-      .catch(error => console.log(error));
+  let onChangeEmail = (e) => {
+    setEmail(e.target.value)
+    console.log(email)
   }
 
+  let onChangeSenha = (e) => {
+    setSenha(e.target.value)
+    console.log(senha)
+  }
+
+  let logar = () => {
+    axios.post("http://localhost:8080/login", 
+    {
+        "email": email,
+        "senha": senha
+    
+    }
+  ).then(resp => {
+    //gravando na sessão do cliente local (no frontend)
+    console.log(resp)
+    sessionStorage.setItem("sessionID", resp?.data?.sessionID)
+
+    }).catch(error => {    
+        console.log(error)
+    });
+  } 
+
+  let entrar = () => {
+    axios.post("http://localhost:8080/login", 
+    {
+        "email": email,
+        "senha": senha
+    
+    }
+  ).then(resp => {
+    
+    
+    if(resp?.data?.sessionID){
+      sessionStorage.setItem("sessionID", resp.data.sessionID)
+      
+      //redireciona o navegador para a home no netflix
+      navigate('home');
+
+    }
+
+
+    }).catch(error => {    
+        console.log(error)
+    });
+  } 
+
   let testar = () => {
-    axios.post("http://localhost:3001/test", {
-      sessionID: sessionStorage.getItem("sessionID")
-    }).then(resp => {
-      setResponse(resp);
-      console.log(resp.data);
-    }).catch(error => console.log(error));
+    axios.post("http://localhost:8080/test", 
+    {
+        "sessionID": sessionStorage.getItem("sessionID")
+    
+    }
+    ).then(resp => {
+     
+      setResponse(resp)
+      console.log(resp.data)
+
+    }).catch(function (error) {    
+        console.log(error)
+    });
+
   }
 
   return (
     <div className="App">
       <header className="App-header">
-        <label>Email:</label>
-        <input type="email" onChange={onChangeEmail} value={email} />
-        <label>Senha:</label>
-        <input type="password" onChange={onChangeSenha} value={senha} />
+          <label>Email:</label> <input onChange={onChangeEmail}></input>
+          <label>Senha:</label> <input onChange={onChangeSenha}></input>
 
-        <button onClick={() => handleLogin(false)}>Logar</button>
-        <button onClick={testar}>Testar</button>
-        <button onClick={() => handleLogin(true)}>Entrar</button>
+          <button onClick={logar}>Logar</button>
 
-        {response && <div>{JSON.stringify(response.data)}</div>}
+          <button onClick={testar}>Testar</button>
+
+          <button onClick={entrar}>Entrar</button>
+
+
+          { response?.data }
+      
       </header>
     </div>
   );

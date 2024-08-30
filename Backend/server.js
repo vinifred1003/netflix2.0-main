@@ -2,15 +2,16 @@ const express = require('express');
 const cors = require('cors');
 const session = require('express-session');
 const jwt = require('jsonwebtoken');
-const fetch = require('node-fetch');
 require('dotenv').config();
+
+const axios = require('axios');
 
 const app = express();
 const PORT = 3001;
 const secretKey = process.env.SECRET_KEY || 'your-secret-key';
-const API_KEY = process.env.API_KEY || 'your-api-key'; // Use environment variable
+const API_KEY = process.env.API_KEY || '47cba9dbaea0a23113695e7b28d62793';
 const DNS = "https://api.themoviedb.org/3";
-
+let usuarioLogado
 // Configurations
 app.use(cors());
 app.use(express.json());
@@ -55,7 +56,7 @@ const findUserByID = (userID) => {
 app.post('/login', (req, res) => {
   const { email, senha } = req.body;
 
-  const usuarioLogado = dados.usuarios.find((usuario) => usuario.email === email && usuario.senha === senha);
+  usuarioLogado = dados.usuarios.find((usuario) => usuario.email === email && usuario.senha === senha);
 
   if (usuarioLogado) {
     req.session.isLogado = true;
@@ -113,24 +114,32 @@ const categories = [
   }
 ];
 
-// Fetch category data route
-app.get('/api/:category', async (req, res) => {
+// New endpoint to fetch categories
+app.get('/categories', (req, res) => {
+  res.json(categories);
+});
+
+// Route to get movies by category
+app.get('/movies/categorySelected', async (req, res) => {
+  const selectedCategory = req.params.category;
+  const objectFinded = categories.find((element) => element.name === selectedCategory);
+
+  if (!objectFinded) {
+    return res.status(404).send('Category not found');
+  }
+  const url = `${DNS}${objectFinded.path}`;
+
   try {
-    const category = categories.find(cat => cat.name === req.params.category);
-    if (!category) {
-      return res.status(404).json({ error: "Category not found" });
+    const response = await axios.get(url);
+    if (usuarioLogado.idade < 18) {
+      response.data.results.find((movie) => !movie.adult)
+    } else {
+      res.json(response.data);
     }
 
-    const response = await fetch(DNS + category.path);
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-
-    const data = await response.json();
-    res.json(data);
   } catch (error) {
-    console.error('Error fetching data from TMDb:', error);
-    res.status(500).json({ error: "Failed to fetch data" });
+    console.error(error);
+    res.status(500).send('Error fetching data from external API');
   }
 });
 
