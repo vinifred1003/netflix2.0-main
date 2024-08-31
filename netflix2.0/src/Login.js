@@ -20,59 +20,59 @@ function Login() {
   }
 
   let logar = () => {
-    axios.post("http://localhost:8080/login", 
-    {
+    axios.post("http://localhost:3001/login",
+      {
         "email": email,
         "senha": senha
-    
-    }
-  ).then(resp => {
-    //gravando na sessão do cliente local (no frontend)
-    console.log(resp)
-    sessionStorage.setItem("sessionID", resp?.data?.sessionID)
 
-    }).catch(error => {    
-        console.log(error)
+      }
+    ).then(resp => {
+      //gravando na sessão do cliente local (no frontend)
+      console.log(resp)
+      sessionStorage.setItem("sessionID", resp?.data?.sessionID)
+
+    }).catch(error => {
+      console.log(error)
     });
-  } 
+  }
 
   let entrar = () => {
-    axios.post("http://localhost:8080/login", 
-    {
+    axios.post("http://localhost:3001/login",
+      {
         "email": email,
         "senha": senha
-    
-    }
-  ).then(resp => {
-    
-    
-    if(resp?.data?.sessionID){
-      sessionStorage.setItem("sessionID", resp.data.sessionID)
-      
-      //redireciona o navegador para a home no netflix
-      navigate('home');
 
-    }
+      }
+    ).then(resp => {
 
 
-    }).catch(error => {    
-        console.log(error)
+      if (resp?.data?.sessionID) {
+        sessionStorage.setItem("sessionID", resp.data.sessionID)
+
+        //redireciona o navegador para a home no netflix
+        navigate('home');
+
+      }
+
+
+    }).catch(error => {
+      console.log(error)
     });
-  } 
+  }
 
   let testar = () => {
-    axios.post("http://localhost:8080/test", 
-    {
+    axios.post("http://localhost:3001/test",
+      {
         "sessionID": sessionStorage.getItem("sessionID")
-    
-    }
+
+      }
     ).then(resp => {
-     
+
       setResponse(resp)
       console.log(resp.data)
 
-    }).catch(function (error) {    
-        console.log(error)
+    }).catch(function (error) {
+      console.log(error)
     });
 
   }
@@ -80,18 +80,18 @@ function Login() {
   return (
     <div className="App">
       <header className="App-header">
-          <label>Email:</label> <input onChange={onChangeEmail}></input>
-          <label>Senha:</label> <input onChange={onChangeSenha}></input>
+        <label>Email:</label> <input onChange={onChangeEmail}></input>
+        <label>Senha:</label> <input onChange={onChangeSenha}></input>
 
-          <button onClick={logar}>Logar</button>
+        <button onClick={logar}>Logar</button>
 
-          <button onClick={testar}>Testar</button>
+        <button onClick={testar}>Testar</button>
 
-          <button onClick={entrar}>Entrar</button>
+        <button onClick={entrar}>Entrar</button>
 
 
-          { response?.data }
-      
+        {response?.data}
+
       </header>
     </div>
   );

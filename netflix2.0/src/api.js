@@ -1,53 +1,64 @@
-const API_KEY = "264bb09ec4d858065cfb8860838a32ff"
-const DNS = "https://api.themoviedb.org/3"
+const express = require('express');
+const axios = require('axios');
 
-export const categories = [
-    {
-        name: "trending",
-        title: "Em Alta",
-        path: "/trending/all/week?api_key="+API_KEY+"&language=pt-BR",
-        isLarge: true,
-    },
-    {
-        name: "netflixOriginals",
-        title: "Originais Netflix",
-        path: "/discover/tv?api_key="+API_KEY+"&with_networks=213",
-        isLarge: false,
-    },
-    {
-        name: "topRated",
-        title: "Populares",
-        path: "/movie/top_rated?api_key="+API_KEY+"&language=pt-BR",
-        isLarge: false,
-    },
-    {
-        name: "comedy",
-        title: "Comédias",
-        path: "/discover/tv?api_key="+API_KEY+"&with_genres=35",
-        isLarge: false,
-    },  
-    {
-        name: "romances",
-        title: "Romances",
-        path: "/discover/tv?api_key="+API_KEY+"&with_genres=10749",
-        isLarge: false,
-    },                
-    {
-        name: "documentaries",
-        title: "Documentários",
-        path: "/discover/tv?api_key="+API_KEY+"&with_genres=99",
-        isLarge: false,
-    }
-]
+const app = express();
+export let categories;
+
+fetch('http://localhost:3001/categories')
+  .then(response => response.json())
+  .then(data => {
+    categories == data
+  })
+  .catch(error => {
+    console.error('Erro ao buscar dados:', error);
+  });
+
+let config = {
+  method: 'post',
+  maxBodyLength: Infinity,
+  url: 'http://localhost:3001/selectedCategory',
+  headers: {
+    'Content-Type': 'text/plain'
+  },
+  data: data
+};
+
+axios.request(config)
+  .then((response) => {
+    console.log(JSON.stringify(response.data));
+  })
+  .catch((error) => {
+    console.log(error);
+  });
+
 
 export const getData = async (path) => {
-    try{
-        
-        let URI = DNS + path
-        let result = await fetch(URI)
-        return result.json()    
+  let config = {
+    method: 'post',
+    maxBodyLength: Infinity,
+    url: 'http://localhost:3001/selectedCategory',
+    headers: {
+      'Content-Type': 'text/plain'
+    },
+    data: path
+  };
 
-    } catch (error){
-        console.log(error)
-    }
+  axios.request(config)
+    .then((response) => {
+      return response.data.json();
+    })
+    .catch((error) => {
+      console.log(error);
+    });
 }
+
+
+
+
+
+
+// Iniciando o servidor na porta 3000
+app.listen(PORT, () => {
+  console.log(`Servidor rodando na porta ${PORT}`);
+});
+

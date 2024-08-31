@@ -143,6 +143,51 @@ app.get('/movies/categorySelected', async (req, res) => {
   }
 });
 
+const getData = async (path) => {
+  try {
+    const URI = DNS + path;
+    console.log('URL gerada:', URI);
+    const result = await axios.get(URI);
+    if (usuarioLogado) {
+      if (usuarioLogado < 18)
+        if (result.data.results) {
+          result.data.results = result.data.results.filter((movie) => movie.adult === false);
+          return result.data;
+        }
+        else {
+          result.data
+        }
+    }
+
+
+
+  } catch (error) {
+    console.error('Erro ao buscar dados:', error);
+    throw error;
+  }
+};
+
+
+
+app.post('/selectedCategory', async (req, res) => {
+  const { pathChosed } = req.body;
+  console.log('Corpo da requisição:', req.body); // Log do corpo da requisição
+  console.log('Path escolhido:', pathChosed); // Log do path escolhido
+
+  try {
+    if (!pathChosed) {
+      return res.status(400).json({ error: 'PathChosed não fornecido.' });
+    }
+
+    const data = await getData(pathChosed);
+    console.log('Dados retornados para a rota /selectedCategory:', data); // Log dos dados retornados
+    res.json(data);
+  } catch (error) {
+    console.error('Erro ao obter dados:', error);
+    res.status(500).json({ error: 'Erro ao obter dados' });
+  }
+});
+
 // Start server
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
